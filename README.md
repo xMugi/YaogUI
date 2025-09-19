@@ -1,3 +1,5 @@
+#Used AI to Fix the Search. It did not work for me so i tried to fix it WITH AI. It works now, no crashes/errors and im happy.
+
 # YaogUI
 
 A UI mod for Amazing Cultivation Simulator. Currently in very early stages of development.
