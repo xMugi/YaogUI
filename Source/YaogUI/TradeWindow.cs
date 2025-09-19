@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FairyGUI;
 using HarmonyLib;
 using XiaWorld.UI.InGame;
@@ -120,23 +120,29 @@ namespace YaogUI
 			try
 			{
 				var tradeWindow = __instance;
-				var searchInput = UI_ClearableInput.CreateInstance();
-                var clearSearchBtn = searchInput.m_clearButton;
-                searchInput.name = TradeWindowFields.SellSearchInput;
+				// Get the existing search input, or create it if it doesn't exist
+				var searchInput = tradeWindow.UIInfo.GetChild(TradeWindowFields.SellSearchInput) as UI_ClearableInput;
+				if (searchInput == null)
+				{
+					searchInput = UI_ClearableInput.CreateInstance();
+					searchInput.name = TradeWindowFields.SellSearchInput;
+					tradeWindow.UIInfo.AddChild(searchInput);
+				}
 
-                var list = tradeWindow.UIInfo.m_rightitem;
+				var clearSearchBtn = searchInput.m_clearButton;
+
+				var list = tradeWindow.UIInfo.m_rightitem;
 				list.foldInvisibleItems = true;
 
 				searchInput.x = list.x - 10;
 				searchInput.y = list.y - 40;
 				searchInput.width = list.width;
 
-                searchInput.onKeyDown.Add(e => { FilterSellList(); });
-                tradeWindow.onRemovedFromStage.Add(e => ClearSellSearch());
-                clearSearchBtn.onClick.Add(e => ClearSellSearch());
-                tradeWindow.UIInfo.m_n51.onClickItem.Add(e => ClearSellSearch());
+				searchInput.m_title.onChanged.Add(e => { FilterSellList(); });
+				tradeWindow.onRemovedFromStage.Add(e => ClearSellSearch());
+				clearSearchBtn.onClick.Add(e => ClearSellSearch());
+				tradeWindow.UIInfo.m_n51.onClickItem.Add(e => ClearSellSearch());
 
-                tradeWindow.UIInfo.AddChild(searchInput);
 			}
 			catch (Exception e)
 			{
@@ -146,35 +152,37 @@ namespace YaogUI
 
 		public static void FilterSellList()
 		{
-			var tradeWindow		= Wnd_SchoolTrade.Instance;
-			var list			= tradeWindow.UIInfo.m_rightitem;
-            var items			= list.GetChildren();
-            var searchText		= tradeWindow.UIInfo.GetChild(TradeWindowFields.SellSearchInput).text;
-            var categoryPanel	= (UI_TradeCategoryList)tradeWindow.UIInfo.GetChild(TradeWindowFields.CategoryPanel);
+			var tradeWindow     = Wnd_SchoolTrade.Instance;
+			var list            = tradeWindow.UIInfo.m_rightitem;
+			var items           = list.GetChildren();
+			// Change this line to use the correct property
+			var searchText      = (tradeWindow.UIInfo.GetChild(TradeWindowFields.SellSearchInput) as UI_ClearableInput).m_title.text;
+			var categoryPanel   = (UI_TradeCategoryList)tradeWindow.UIInfo.GetChild(TradeWindowFields.CategoryPanel);
 			var ignoreWorthlessItems = categoryPanel.m_hideWorthlessCheckbox.selected;
 
-            // Meh... this can be simplified but w/e
-            var callbacks = new List<Func<UI_TradeItem, bool>>
-            {
-                item => item.m_itemname.text.ToLower().Contains(searchText.ToLower())
-            };
-            if (ignoreWorthlessItems)
-            {
-                callbacks.Add(item => !TradeWindowFields.ignoreItemsList.Contains(item.name));
-            }
+			// Meh... this can be simplified but w/e
+			var callbacks = new List<Func<UI_TradeItem, bool>>
+			{
+				item => item.m_itemname.text.ToLower().Contains(searchText.ToLower())
+			};
+			if (ignoreWorthlessItems)
+			{
+				callbacks.Add(item => !TradeWindowFields.ignoreItemsList.Contains(item.name));
+			}
 
-            foreach (UI_TradeItem item in items)
-            {
-                item.visible = callbacks.TrueForAll(x => x(item));
-            }
-        }
+			foreach (UI_TradeItem item in items)
+			{
+				item.visible = callbacks.TrueForAll(x => x(item));
+			}
+		}
 
 		private static void ClearSellSearch()
 		{
-			var searchField = Wnd_SchoolTrade.Instance.UIInfo.GetChild(TradeWindowFields.SellSearchInput);
-            searchField.text = "";
-            FilterSellList();
-        }
+			// Change this line to use the correct property
+			var searchField = Wnd_SchoolTrade.Instance.UIInfo.GetChild(TradeWindowFields.SellSearchInput) as UI_ClearableInput;
+			searchField.m_title.text = "";
+			FilterSellList();
+		}
 
 	}
 
