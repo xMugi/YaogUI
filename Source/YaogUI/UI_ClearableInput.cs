@@ -8,6 +8,7 @@ namespace YaogUI
     public partial class UI_ClearableInput : GLabel
     {
         public Controller m_grayed;
+        public GTextInput m_title; // Add this line
         public GButton m_clearButton;
         public const string URL = "ui://m5coew5eon84b7";
 
@@ -21,6 +22,7 @@ namespace YaogUI
             base.ConstructFromXML(xml);
 
             m_grayed = GetControllerAt(0);
+            m_title = (GTextInput)GetChildAt(1); // Add this line
             m_clearButton = (GButton)GetChildAt(2);
         }
     }
