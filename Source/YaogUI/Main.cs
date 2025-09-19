@@ -29,7 +29,16 @@ namespace YaogUI
 		}
 		public static void Debug(string message)
 		{
-			KLog.Dbg(string.Format("[YaogUI]{0}", message), new object[0]);
+			// The original code has an issue where an empty message is logged
+			// if there is an exception but a bad format string
+			if (string.IsNullOrEmpty(message))
+			{
+				KLog.Dbg("[YaogUI]An unknown error occurred.", new object[0]);
+			}
+			else
+			{
+				KLog.Dbg(string.Format("[YaogUI]{0}", message), new object[0]);
+			}
 		}
 	}
 }
