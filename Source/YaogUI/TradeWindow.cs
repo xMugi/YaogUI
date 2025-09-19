@@ -152,12 +152,12 @@ namespace YaogUI
 
 		public static void FilterSellList()
 		{
-			var tradeWindow     = Wnd_SchoolTrade.Instance;
-			var list            = tradeWindow.UIInfo.m_rightitem;
-			var items           = list.GetChildren();
+			var tradeWindow = Wnd_SchoolTrade.Instance;
+			var list = tradeWindow.UIInfo.m_rightitem;
+			var items = list.GetChildren();
 			// Change this line to use the correct property
-			var searchText      = (tradeWindow.UIInfo.GetChild(TradeWindowFields.SellSearchInput) as UI_ClearableInput).m_title.text;
-			var categoryPanel   = (UI_TradeCategoryList)tradeWindow.UIInfo.GetChild(TradeWindowFields.CategoryPanel);
+			var searchText = (tradeWindow.UIInfo.GetChild(TradeWindowFields.SellSearchInput) as UI_ClearableInput).m_title.text;
+			var categoryPanel = (UI_TradeCategoryList)tradeWindow.UIInfo.GetChild(TradeWindowFields.CategoryPanel);
 			var ignoreWorthlessItems = categoryPanel.m_hideWorthlessCheckbox.selected;
 
 			// Meh... this can be simplified but w/e
@@ -194,7 +194,13 @@ namespace YaogUI
 			try
 			{
 				var tradeWindow = __instance;
-				var searchInput = UI_ClearableInput.CreateInstance();
+				var searchInput = tradeWindow.UIInfo.GetChild(TradeWindowFields.BuySearchInput) as UI_ClearableInput;
+				if (searchInput == null)
+				{
+					searchInput = UI_ClearableInput.CreateInstance();
+					searchInput.name = TradeWindowFields.BuySearchInput;
+					tradeWindow.UIInfo.AddChild(searchInput);
+				}
 				var clearSearchBtn = searchInput.m_clearButton;
 				searchInput.name = TradeWindowFields.BuySearchInput;
 
@@ -205,7 +211,7 @@ namespace YaogUI
 				searchInput.y = list.y - 40;
 				searchInput.width = list.width;
 
-				searchInput.onKeyDown.Add(e => FilterBuyList());
+				searchInput.m_title.onChanged.Add(e => { FilterBuyList(); });
 				tradeWindow.onRemovedFromStage.Add(e => ClearBuySearch());
 				clearSearchBtn.onClick.Add(e => ClearBuySearch());
 				// Search again when switching schools since items have changed
@@ -224,7 +230,7 @@ namespace YaogUI
 			var tradeWindow = Wnd_SchoolTrade.Instance;
 			var list = tradeWindow.UIInfo.m_leftitem;
 			var items = list.GetChildren();
-			var searchText = tradeWindow.UIInfo.GetChild(TradeWindowFields.BuySearchInput).text;
+			var searchText = (tradeWindow.UIInfo.GetChild(TradeWindowFields.BuySearchInput) as UI_ClearableInput).m_title.text;
 			Main.Debug(searchText);
 
 			foreach (UI_TradeItem item in items)
@@ -235,8 +241,8 @@ namespace YaogUI
 
 		private static void ClearBuySearch(string searchText = "")
 		{
-			var searchField = Wnd_SchoolTrade.Instance.UIInfo.GetChild(TradeWindowFields.BuySearchInput);
-			searchField.text = searchText;
+			var searchField = Wnd_SchoolTrade.Instance.UIInfo.GetChild(TradeWindowFields.BuySearchInput) as UI_ClearableInput;
+			searchField.m_title.text = "";
 			FilterBuyList();
 		}
 
